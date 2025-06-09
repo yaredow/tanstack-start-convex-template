@@ -1,1 +1,1 @@
-Tanstack start + Convex + Better-auth plugin
+Tanstack start + Convex + Better-auth template
