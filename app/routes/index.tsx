@@ -8,13 +8,5 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { data } = useSuspenseQuery(convexQuery(api.tasks.get, {}));
-
-  return (
-    <div>
-      {data.map(({ _id, text }) => (
-        <div key={_id}>{text}</div>
-      ))}
-    </div>
-  );
+  return <div>Let's go!</div>;
 }
