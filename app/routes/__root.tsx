@@ -6,7 +6,6 @@ import {
 import { Meta, Scripts, createServerFn } from "@tanstack/react-start";
 import { QueryClient } from "@tanstack/react-query";
 import * as React from "react";
-import appCss from "~/styles/app.css?url";
 import { ConvexQueryClient } from "@convex-dev/react-query";
 import { ConvexReactClient } from "convex/react";
 import { getCookie, getWebRequest } from "@tanstack/react-start/server";
@@ -16,6 +15,8 @@ import {
   getCookieName,
 } from "@convex-dev/better-auth/react-start";
 import { createAuth } from "../../convex/auth";
+
+import appCss from "../styles/app.css?url";
 import { authClient } from "@/lib/auth-client";
 
 // Server side session request
