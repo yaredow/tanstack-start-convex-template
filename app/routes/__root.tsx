@@ -17,7 +17,7 @@ import {
 import { createAuth } from "../../convex/auth";
 
 import appCss from "../styles/app.css?url";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "../lib/auth-client";
 
 // Server side session request
 const fetchAuth = createServerFn({ method: "GET" }).handler(async () => {
