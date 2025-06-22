@@ -1,41 +1,19 @@
+/// <reference types="vite/client" />
+import { DefaultCatchBoundary } from "@/components/default-catch-boundary";
 import {
+  HeadContent,
+  Link,
   Outlet,
-  createRootRouteWithContext,
-  useRouteContext,
+  Scripts,
+  createRootRoute,
 } from "@tanstack/react-router";
-import { Meta, Scripts, createServerFn } from "@tanstack/react-start";
-import { QueryClient } from "@tanstack/react-query";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import * as React from "react";
-import { ConvexQueryClient } from "@convex-dev/react-query";
-import { ConvexReactClient } from "convex/react";
-import { getCookie, getWebRequest } from "@tanstack/react-start/server";
-import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
-import {
-  fetchSession,
-  getCookieName,
-} from "@convex-dev/better-auth/react-start";
-import { createAuth } from "../../convex/auth";
-
 import appCss from "../styles/app.css?url";
-import { authClient } from "../lib/auth-client";
+import { seo } from "@/utils/seo";
+import { NotFound } from "@/components/not-found";
 
-// Server side session request
-const fetchAuth = createServerFn({ method: "GET" }).handler(async () => {
-  const sessionCookieName = await getCookieName(createAuth);
-  const token = getCookie(sessionCookieName);
-  const request = getWebRequest();
-  const { session } = await fetchSession(createAuth, request);
-  return {
-    userId: session?.user.id,
-    token,
-  };
-});
-
-export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient;
-  convexClient: ConvexReactClient;
-  convexQueryClient: ConvexQueryClient;
-}>()({
+export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
@@ -45,51 +23,81 @@ export const Route = createRootRouteWithContext<{
         name: "viewport",
         content: "width=device-width, initial-scale=1",
       },
+      ...seo({
+        title:
+          "TanStack Start | Type-Safe, Client-First, Full-Stack React Framework",
+        description: `TanStack Start is a type-safe, client-first, full-stack React framework. `,
+      }),
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      {
+        rel: "apple-touch-icon",
+        sizes: "180x180",
+        href: "/apple-touch-icon.png",
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        sizes: "32x32",
+        href: "/favicon-32x32.png",
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        sizes: "16x16",
+        href: "/favicon-16x16.png",
+      },
+      { rel: "manifest", href: "/site.webmanifest", color: "#fffff" },
       { rel: "icon", href: "/favicon.ico" },
     ],
+    scripts: [
+      {
+        src: "/customScript.js",
+        type: "text/javascript",
+      },
+    ],
   }),
-  beforeLoad: async (ctx) => {
-    // all queries, mutations and action made with TanStack Query will be
-    // authenticated by an identity token.
-    const auth = await fetchAuth();
-    const { userId, token } = auth;
-
-    // During SSR only (the only time serverHttpClient exists),
-    // set the auth token for Convex to make HTTP queries with.
-    if (token) {
-      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
-    }
-
-    return { userId, token };
+  errorComponent: (props) => {
+    return (
+      <RootDocument>
+        <DefaultCatchBoundary {...props} />
+      </RootDocument>
+    );
   },
+  notFoundComponent: () => <NotFound />,
   component: RootComponent,
 });
 
 function RootComponent() {
-  const context = useRouteContext({ from: Route.id });
   return (
-    <ConvexBetterAuthProvider
-      client={context.convexClient}
-      authClient={authClient}
-    >
-      <RootDocument>
-        <Outlet />
-      </RootDocument>
-    </ConvexBetterAuthProvider>
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
   );
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html>
       <head>
-        <Meta />
+        <HeadContent />
       </head>
-      <body className="bg-neutral-950 text-neutral-50">
+      <body>
+        <div className="p-2 flex gap-2 text-lg">
+          <Link
+            to="/"
+            activeProps={{
+              className: "font-bold",
+            }}
+            activeOptions={{ exact: true }}
+          >
+            Home
+          </Link>
+        </div>
+        <hr />
         {children}
+        <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
       </body>
     </html>
